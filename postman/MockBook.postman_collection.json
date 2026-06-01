@@ -1,0 +1,126 @@
+{
+  "info": {
+    "name": "MockBook API",
+    "description": "Manual exploration collection for MockBook endpoints. Mirrors the automated suite in tests/api.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "email", "value": "qa+postman@mockbook.test" },
+    { "key": "password", "value": "TestPass123!" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Signup (NJ)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/signup",
+            "body": { "mode": "raw", "raw": "{\"email\":\"{{email}}\",\"password\":\"{{password}}\",\"state_code\":\"NJ\"}" }
+          }
+        },
+        {
+          "name": "Signup (blocked CA)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/signup",
+            "body": { "mode": "raw", "raw": "{\"email\":\"ca+{{$timestamp}}@x.com\",\"password\":\"TestPass123!\",\"state_code\":\"CA\"}" }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": { "exec": ["const j = pm.response.json(); if (j.token) pm.collectionVariables.set('token', j.token);"] }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": { "mode": "raw", "raw": "{\"email\":\"{{email}}\",\"password\":\"{{password}}\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "item": [
+        {
+          "name": "Get account",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/account"
+          }
+        },
+        {
+          "name": "Update deposit limit",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/account/limit",
+            "body": { "mode": "raw", "raw": "{\"deposit_limit_daily\":250}" }
+          }
+        },
+        {
+          "name": "Self-exclude",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/account/self-exclude"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Promos",
+      "item": [
+        {
+          "name": "List active",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/promos/active" }
+        },
+        {
+          "name": "Claim WELCOME50",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/promos/claim",
+            "body": { "mode": "raw", "raw": "{\"code\":\"WELCOME50\"}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Geo",
+      "item": [
+        {
+          "name": "Check NJ (allowed)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-mock-state", "value": "NJ" }],
+            "url": "{{baseUrl}}/api/geo/check"
+          }
+        },
+        {
+          "name": "Check CA (blocked)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "x-mock-state", "value": "CA" }],
+            "url": "{{baseUrl}}/api/geo/check"
+          }
+        }
+      ]
+    }
+  ]
+}
