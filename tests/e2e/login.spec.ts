@@ -21,6 +21,6 @@ test.describe('Login E2E @regression', () => {
     const login = new LoginPage(page);
     await login.open();
     await login.login('nobody@nowhere.test', 'WrongPass123!');
-    await expect(login.message).toContainText(/invalid|Error/);
+    await expect(login.message).toContainText(/invalid/i);
   });
 });

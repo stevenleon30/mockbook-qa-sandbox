@@ -7,12 +7,15 @@ import { uniqueEmail, TEST_PASSWORD, PROMO_CODES } from '../fixtures/data';
 test.describe('Promo claim E2E @regression', () => {
   test('Logged-in user claims WELCOME50 @critical', async ({ page }) => {
     const email = uniqueEmail();
-    await new SignupPage(page).open();
-    await new SignupPage(page).signup(email, TEST_PASSWORD);
+    const signup = new SignupPage(page);
+    await signup.open();
+    await signup.signup(email, TEST_PASSWORD);
+    await signup.expectSuccess(email);
 
     const login = new LoginPage(page);
     await login.open();
     await login.login(email, TEST_PASSWORD);
+    await login.expectLoggedIn(email);
 
     const promos = new PromosPage(page);
     await promos.open();
@@ -22,10 +25,15 @@ test.describe('Promo claim E2E @regression', () => {
 
   test('User sees error claiming expired promo', async ({ page }) => {
     const email = uniqueEmail();
-    await new SignupPage(page).open();
-    await new SignupPage(page).signup(email, TEST_PASSWORD);
-    await new LoginPage(page).open();
-    await new LoginPage(page).login(email, TEST_PASSWORD);
+    const signup = new SignupPage(page);
+    await signup.open();
+    await signup.signup(email, TEST_PASSWORD);
+    await signup.expectSuccess(email);
+
+    const login = new LoginPage(page);
+    await login.open();
+    await login.login(email, TEST_PASSWORD);
+    await login.expectLoggedIn(email);
 
     const promos = new PromosPage(page);
     await promos.open();

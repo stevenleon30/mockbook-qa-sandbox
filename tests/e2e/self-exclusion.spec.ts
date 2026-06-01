@@ -7,10 +7,15 @@ import { uniqueEmail, TEST_PASSWORD } from '../fixtures/data';
 test.describe('Self-exclusion E2E @regression @critical', () => {
   test('User self-excludes and is blocked from logging back in', async ({ page }) => {
     const email = uniqueEmail();
-    await new SignupPage(page).open();
-    await new SignupPage(page).signup(email, TEST_PASSWORD);
-    await new LoginPage(page).open();
-    await new LoginPage(page).login(email, TEST_PASSWORD);
+    const signup = new SignupPage(page);
+    await signup.open();
+    await signup.signup(email, TEST_PASSWORD);
+    await signup.expectSuccess(email);
+
+    const login = new LoginPage(page);
+    await login.open();
+    await login.login(email, TEST_PASSWORD);
+    await login.expectLoggedIn(email);
 
     const account = new AccountPage(page);
     await account.open();
@@ -21,9 +26,9 @@ test.describe('Self-exclusion E2E @regression @critical', () => {
     // Try to log in again
     await page.context().clearCookies();
     await page.evaluate(() => localStorage.clear());
-    const login = new LoginPage(page);
-    await login.open();
-    await login.login(email, TEST_PASSWORD);
-    await expect(login.message).toContainText(/self-excluded/);
+    const relogin = new LoginPage(page);
+    await relogin.open();
+    await relogin.login(email, TEST_PASSWORD);
+    await expect(relogin.message).toContainText(/self-excluded/);
   });
 });
