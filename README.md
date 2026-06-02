@@ -1,5 +1,4 @@
 # MockBook QA Sandbox
-![43 tests passing](docs/images/tests-passing.png)
 
 A mini sportsbook app built to demonstrate Senior Manual QA Engineer skills: API testing, SQL validation, regression automation, Playwright, and AI-assisted QA workflows.
 
